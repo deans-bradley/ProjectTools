@@ -61,7 +61,7 @@ This will change the directory to `MyApp` within your defined project structure.
 
 ### 2. **`pt open <ProjectName> -code`**
 
-This command works like `pt open`, but also opens the project in **VS Code** if the `code` command is available on your system.
+This command works like `pt open`, but also opens the project in **VS Code** using the `-code` flag.
 
 #### Syntax:
 ```powershell
@@ -73,6 +73,11 @@ pt open <ProjectName> -code
 pt open MyApp -code
 ```
 This will change to the `MyApp` project directory and open the project in **VS Code**.
+
+We can also simply write the code flag as `-c`.
+```powershell
+pt open MyApp -c
+```
 
 ---
 
