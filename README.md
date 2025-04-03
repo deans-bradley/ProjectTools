@@ -1,10 +1,6 @@
 # ProjectTools PowerShell Module
 
-## Introduction
-
-The **ProjectTools** module is a collection of PowerShell functions designed to simplify navigating between your projects and integrating with tools like **VS Code**. This module makes it easy to switch to project directories, open them in VS Code, and quickly list all available projects in your workspace.
-
-### Key Features:
+## Key Features:
 - **Navigate to project directories** with ease.
 - **Open projects in VS Code** with a single command.
 - **List all available projects** in your workspace for easy reference.
