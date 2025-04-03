@@ -1,24 +1,21 @@
-# Global variable to store project paths
-$global:ProjectPaths = @{}
-
-function update-projects {
+function get-projects {
+    $projects = @{}
     $basePath = "C:\Users\$($env:USERNAME)\Work"
     $companyDirs = Get-ChildItem -Path $basePath -Directory
-    $global:ProjectPaths.Clear()
 
     foreach ($company in $companyDirs) {
         $repoPath = "$($company.FullName)\repos"
 
         if (Test-Path $repoPath) {
-            $projects = Get-ChildItem -Path $repoPath -Directory
+            $repos = Get-ChildItem -Path $repoPath -Directory
 
-            foreach ($project in $projects) {
-                $global:ProjectPaths[$project.Name] = $project.FullName
+            foreach ($project in $repos) {
+                $projects[$project.Name] = $project.FullName
             }
         }
     }
 
-    Write-Host "Projects updated successfully!" -ForegroundColor Green
+    return $projects
 }
 
 function open-project {
@@ -26,21 +23,25 @@ function open-project {
         [string]$ProjectName
     )
 
-    if ($global:ProjectPaths.ContainsKey($ProjectName)) {
-        Set-Location $global:ProjectPaths[$ProjectName]
+    $projects = get-projects
+
+    if ($projects.ContainsKey($ProjectName)) {
+        Set-Location $projects[$ProjectName]
     } else {
-        Write-Host "Project '$ProjectName' not found. Run 'Update-Projects' to refresh." -ForegroundColor Red
+        Write-Host "Project '$ProjectName' not found." -ForegroundColor Red
     }
 }
 
 function list-projects {
-    if ($global:ProjectPaths.Count -eq 0) {
-        Write-Host "No projects found. Run 'Update-Projects' first." -ForegroundColor Red
+    $projects = get-projects
+
+    if ($projects.Count -eq 0) {
+        Write-Host "No projects found." -ForegroundColor Red
         return
     }
 
     Write-Host "Available Projects:" -ForegroundColor Cyan
-    foreach ($key in $global:ProjectPaths.Keys) {
-        Write-Host " - $key => $($global:ProjectPaths[$key])"
+    foreach ($key in $projects.Keys) {
+        Write-Host " - $key => $($projects[$key])"
     }
 }
