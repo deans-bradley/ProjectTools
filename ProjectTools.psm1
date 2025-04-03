@@ -1,4 +1,4 @@
-function get-projects {
+function Get-Projects {
     $projects = @{}
     $basePath = "C:\Users\$($env:USERNAME)\Work"
     $companyDirs = Get-ChildItem -Path $basePath -Directory
@@ -18,12 +18,12 @@ function get-projects {
     return $projects
 }
 
-function open-project {
+function Open-Project {
     param (
         [string]$ProjectName
     )
 
-    $projects = get-projects
+    $projects = Get-Projects
 
     if ($projects.ContainsKey($ProjectName)) {
         Set-Location $projects[$ProjectName]
@@ -32,8 +32,8 @@ function open-project {
     }
 }
 
-function list-projects {
-    $projects = get-projects
+function Show-Projects {
+    $projects = Get-Projects
 
     if ($projects.Count -eq 0) {
         Write-Host "No projects found." -ForegroundColor Red
@@ -45,3 +45,5 @@ function list-projects {
         Write-Host " - $key => $($projects[$key])"
     }
 }
+
+Export-ModuleMember -Function Open-Project, Show-Projects

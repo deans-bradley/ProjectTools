@@ -1,1 +1,0 @@
-fnm env | Out-String | Invoke-Expression
