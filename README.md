@@ -104,5 +104,3 @@ This will display a list of all available projects along with their paths.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
