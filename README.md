@@ -1,6 +1,6 @@
 # ProjectTools PowerShell Module
 
-## Key Features:
+**Key Features**:
 - **Navigate to project directories** with ease.
 - **Open projects in VS Code** with a single command.
 - **List all available projects** in your workspace for easy reference.
