@@ -77,7 +77,7 @@ function Show-Projects {
 
     Write-Host "Available Projects:" -ForegroundColor Cyan
     foreach ($key in $projects.Keys) {
-        Write-Host " - $key => $($projects[$key])"
+        Write-Host " - $key"
     }
 }
 
