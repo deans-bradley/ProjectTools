@@ -22,20 +22,34 @@ function pt {
     }
 }
 
-function Get-Repos {
-    $repos = @{}
+function Get-Projects {
+    $projects = @()
     $basePath = "C:\Users\$($env:USERNAME)\Work"
     $projectDirs = Get-ChildItem -Path $basePath -Directory
 
-    foreach ($project in $projectDirs) {
-        $repoPath = "$($project.FullName)\repos"
+    foreach ($projectDir in $projectDirs) {
+        $project = [Project]::new()
+        $project.Name = $projectDir.Name
+        $project.Path = $projectDir.FullName
+        $project.Repos = Get-Repos -RepoPath "$($projectDir.FullName)\repos"
+        $projects += $project
+    }
 
-        if (Test-Path $repoPath) {
-            $projectRepos = Get-ChildItem -Path $repoPath -Directory
+    return $projects
+}
 
-            foreach ($repo in $projectRepos) {
-                $repos[$repo.Name] = $repo.FullName
-            }
+function Get-Repos {
+    param (
+        [string]$RepoPath
+    )
+
+    $repos = @{}
+
+    if (Test-Path $RepoPath) {
+        $projectRepos = Get-ChildItem -Path $RepoPath -Directory
+
+        foreach ($repo in $projectRepos) {
+            $repos[$repo.Name] = $repo.FullName
         }
     }
 
@@ -48,37 +62,53 @@ function Open-Repo {
         [switch]$Code  
     )
 
-    $repos = Get-Repos
+    $projects = Get-Projects
+    $repoFound = $false
 
-    if ($repos.ContainsKey($RepoName)) {
-        $repoPath = $repos[$RepoName]
-        Set-Location $repoPath  
-
-        if ($Code) {
-            if (Get-Command code -ErrorAction SilentlyContinue) {
-                Start-Process "code" -ArgumentList $repoPath
-                Write-Host "Repo '$RepoName' opened in VS Code." -ForegroundColor Green
-            } else {
-                Write-Host "VS Code is not installed or the 'code' command is not available." -ForegroundColor Red
+    foreach ($project in $projects) {
+        if ($project.Repos.ContainsKey($RepoName)) {
+            $repoPath = $project.Repos[$RepoName]
+            Set-Location $repoPath  
+    
+            if ($Code) {
+                if (Get-Command code -ErrorAction SilentlyContinue) {
+                    Start-Process "code" -ArgumentList $repoPath
+                    Write-Host "Repo '$RepoName' opened in VS Code." -ForegroundColor Green
+                } else {
+                    Write-Host "VS Code is not installed or the 'code' command is not available." -ForegroundColor Red
+                }
             }
+            $repoFound = $true
+            break
         }
-    } else {
-        Write-Host "Repo '$RepoName' not found." -ForegroundColor Red
     }
+
+    if (!$repoFound) {
+        Write-Host "Repo '$RepoName' not found." -ForegroundColor Red
+    } 
 }
 
 function Show-Repos {
-    $repos = Get-Repos
+    $projects = Get-Projects
 
-    if ($repos.Count -eq 0) {
-        Write-Host "No repos found." -ForegroundColor Red
+    if ($projects.Count -eq 0) {
+        Write-Host "No projects found." -ForegroundColor Red
         return
     }
 
-    Write-Host "Available Repos:" -ForegroundColor Cyan
-    foreach ($key in $repos.Keys) {
-        Write-Host " - $key"
+    Write-Host "Available Projects:" -ForegroundColor Cyan
+    foreach ($project in $projects) {
+        Write-Host " - $($project.Name)" -ForegroundColor Green
+        foreach ($repo in $project.Repos.Keys) {
+            Write-Host "   - $repo" -ForegroundColor Gray
+        }
     }
+}
+
+class Project {
+    [string]$Name
+    [string]$Path
+    [hashtable]$Repos
 }
 
 Export-ModuleMember -Function pt
