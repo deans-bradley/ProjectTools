@@ -1,19 +1,19 @@
 function pt {
     param (
         [string]$Action,
-        [string]$ProjectName,
+        [string]$RepoName,
         [switch]$Code 
     )
 
     switch ($Action) {
         'show' {
-            Show-Projects
+            Show-Repos
         }
         'open' {
-            if ($ProjectName) {
-                Open-Project -ProjectName $ProjectName -Code:$Code
+            if ($RepoName) {
+                Open-Repo -RepoName $RepoName -Code:$Code
             } else {
-                Write-Host "Please specify a project name to open." -ForegroundColor Red
+                Write-Host "Please specify a repo name to open." -ForegroundColor Red
             }
         }
         default {
@@ -22,61 +22,61 @@ function pt {
     }
 }
 
-function Get-Projects {
-    $projects = @{}
+function Get-Repos {
+    $repos = @{}
     $basePath = "C:\Users\$($env:USERNAME)\Work"
-    $companyDirs = Get-ChildItem -Path $basePath -Directory
+    $projectDirs = Get-ChildItem -Path $basePath -Directory
 
-    foreach ($company in $companyDirs) {
-        $repoPath = "$($company.FullName)\repos"
+    foreach ($project in $projectDirs) {
+        $repoPath = "$($project.FullName)\repos"
 
         if (Test-Path $repoPath) {
-            $repos = Get-ChildItem -Path $repoPath -Directory
+            $projectRepos = Get-ChildItem -Path $repoPath -Directory
 
-            foreach ($project in $repos) {
-                $projects[$project.Name] = $project.FullName
+            foreach ($repo in $projectRepos) {
+                $repos[$repo.Name] = $repo.FullName
             }
         }
     }
 
-    return $projects
+    return $repos
 }
 
-function Open-Project {
+function Open-Repo {
     param (
-        [string]$ProjectName,
+        [string]$RepoName,
         [switch]$Code  
     )
 
-    $projects = Get-Projects
+    $repos = Get-Repos
 
-    if ($projects.ContainsKey($ProjectName)) {
-        $projectPath = $projects[$ProjectName]
-        Set-Location $projectPath  
+    if ($repos.ContainsKey($RepoName)) {
+        $repoPath = $repos[$RepoName]
+        Set-Location $repoPath  
 
         if ($Code) {
             if (Get-Command code -ErrorAction SilentlyContinue) {
-                Start-Process "code" -ArgumentList $projectPath
-                Write-Host "Project '$ProjectName' opened in VS Code." -ForegroundColor Green
+                Start-Process "code" -ArgumentList $repoPath
+                Write-Host "Repo '$RepoName' opened in VS Code." -ForegroundColor Green
             } else {
                 Write-Host "VS Code is not installed or the 'code' command is not available." -ForegroundColor Red
             }
         }
     } else {
-        Write-Host "Project '$ProjectName' not found." -ForegroundColor Red
+        Write-Host "Repo '$RepoName' not found." -ForegroundColor Red
     }
 }
 
-function Show-Projects {
-    $projects = Get-Projects
+function Show-Repos {
+    $repos = Get-Repos
 
-    if ($projects.Count -eq 0) {
-        Write-Host "No projects found." -ForegroundColor Red
+    if ($repos.Count -eq 0) {
+        Write-Host "No repos found." -ForegroundColor Red
         return
     }
 
-    Write-Host "Available Projects:" -ForegroundColor Cyan
-    foreach ($key in $projects.Keys) {
+    Write-Host "Available Repos:" -ForegroundColor Cyan
+    foreach ($key in $repos.Keys) {
         Write-Host " - $key"
     }
 }
