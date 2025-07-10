@@ -11,7 +11,7 @@ class ProjectTools {
   constructor() {
     this.configPath = path.join(os.homedir(), '.projecttools', 'config.json');
     this.defaultConfig = {
-      appVersion: '1.0.0',
+      appVersion: '0.1.0',
       activeProfile: null,
       profiles: [],
       workspaces: [],
