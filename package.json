@@ -1,8 +1,10 @@
+
 {
   "name": "projecttools",
   "version": "1.0.0",
-  "description": "A CLI tool for managing development projects across multiple workspaces and profiles",
+  "description": "A CLI tool for managing development projects across multiple workspaces and profiles.",
   "main": "index.js",
+  "type": "module",
   "bin": {
     "pt": "./bin/pt.js"
   },

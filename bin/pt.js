@@ -18,8 +18,8 @@ const pt = new ProjectTools();
 
 program
   .name('pt')
-  .description('ProjectTools - Manage your development projects across workspaces and profiles')
-  .version('1.0.0');
+  .description('ProjectTools - Manage your development projects across workspaces and profiles.')
+  .version('0.1.0');
 
 program
   .command('profile')
@@ -47,7 +47,7 @@ program
   .description('Test command to verify installation')
   .action(() => {
     console.log(chalk.green('🎉 ProjectTools is working!'));
-    console.log(chalk.blue('Ready to manage your projects like a boss!'));
+    console.log(chalk.blue('Ready to manage your projects with ease!'));
   });
 
 program.action(() => {
