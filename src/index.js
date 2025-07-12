@@ -76,11 +76,20 @@ class ProjectTools {
   }
 
   /**
-   * Get configuration file path (useful for debugging)
+   * Get configuration file path
    * @returns {string} Path to configuration file
    */
   getConfigPath() {
     return this.configPath;
+  }
+
+  /**
+   * Format name string to a valid value
+   * @param {string} name - Name string to be cleaned.
+   * @returns {string} Name converted to lowercase and whitespace removed 
+   */
+  cleanName(name) {
+    return name.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
   }
 
   // ====================
@@ -98,7 +107,7 @@ class ProjectTools {
         return { success: false, message: 'Profile name cannot be empty' };
       }
 
-      const cleanName = profileName.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+      const cleanName = this.cleanName(profileName);
       
       if (cleanName !== profileName.trim().toLowerCase()) {
         console.log(chalk.yellow(`📝 Profile name cleaned: "${profileName}" → "${cleanName}"`));
@@ -147,6 +156,34 @@ class ProjectTools {
     } catch (error) {
       console.error(chalk.red('❌ Error loading profiles:'), error.message);
       return [];
+    }
+  }
+
+  /**
+   * Switch to a different profile
+   * @param {string} profileName - Name of the profile to switch
+   * @returns {Object} Result object with success status and message
+   */
+  async switchProfile(profileName) {
+    try {
+      if (!profileName || profileName.trim() === '') {
+        return { success: false, message: 'Profile name cannot be empty' };
+      }
+
+      const cleanName = this.cleanName(profileName);
+      const config = await this.loadConfig();
+
+      if (config.activeProfile === cleanName) {
+        return { success: false, message: `Already on profile "${cleanName}"` };
+      } else if (!config.profiles.find(profile => profile.name === cleanName)) {
+        return { success: false, message: `Profile "${cleanName}" does not exist` };
+      } else {
+        config.activeProfile = cleanName;
+        await this.saveConfig(config);
+        return { success: true, profileName: cleanName };
+      }
+    } catch (error) {
+      return { success: false, message: error.message };
     }
   }
 }
