@@ -21,11 +21,48 @@ program
   .description('ProjectTools - Manage your development projects across workspaces and profiles.')
   .version('0.1.0');
 
-program
+const profileCommand = program
   .command('profile')
-  .description('Manage profiles')
-  .action(() => {
-    console.log(chalk.yellow('Profile management coming soon...'));
+  .description('Manage profiles');
+
+profileCommand
+  .command('add <profileName>')
+  .description('Create a new profile')
+  .action(async (profileName) => {
+    try {
+      const result = await pt.addProfile(profileName);
+      if (result.success) {
+        console.log(chalk.green(`✅ Profile "${profileName}" created successfully!`));
+        if (result.isFirstProfile) {
+          console.log(chalk.blue(`🎯 "${profileName}" is now your active profile`));
+        }
+      } else {
+        console.log(chalk.red(`❌ ${result.message}`));
+      }
+    } catch (error) {
+      console.error(chalk.red('❌ Error creating profile:'), error.message);
+    }
+  });
+
+profileCommand
+  .command('list')
+  .description('List all profiles')
+  .action(async () => {
+    try {
+      const profiles = await pt.listProfiles();
+      if (profiles.length === 0) {
+        console.log(chalk.yellow('📝 No profiles found. Create one with: pt profile add <name>'));
+      } else {
+        console.log(chalk.cyan('\n📋 Available Profiles:'));
+        profiles.forEach(profile => {
+          const indicator = profile.active ? chalk.green('● (active)') : chalk.gray('○');
+          console.log(`  ${indicator} ${profile.name}`);
+        });
+        console.log('');
+      }
+    } catch (error) {
+      console.error(chalk.red('❌ Error listing profiles:'), error.message);
+    }
   });
 
 program

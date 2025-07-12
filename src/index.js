@@ -72,7 +72,7 @@ class ProjectTools {
    * @returns {string} Unique ID
    */
   generateId(prefix = 'id') {
-    return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
   }
 
   /**
@@ -81,6 +81,73 @@ class ProjectTools {
    */
   getConfigPath() {
     return this.configPath;
+  }
+
+  // ====================
+  // PROFILE MANAGEMENT
+  // ====================
+
+  /**
+   * Add a new profile
+   * @param {string} profileName - Name of the profile to create
+   * @returns {Object} Result object with success status and message
+   */
+  async addProfile(profileName) {
+    try {
+      if (!profileName || profileName.trim() === '') {
+        return { success: false, message: 'Profile name cannot be empty' };
+      }
+
+      const cleanName = profileName.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+      
+      if (cleanName !== profileName.trim().toLowerCase()) {
+        console.log(chalk.yellow(`📝 Profile name cleaned: "${profileName}" → "${cleanName}"`));
+      }
+
+      const config = await this.loadConfig();
+
+      const existingProfile = config.profiles.find(p => p.name === cleanName);
+      if (existingProfile) {
+        return { success: false, message: `Profile "${cleanName}" already exists` };
+      }
+
+      const newProfile = {
+        id: this.generateId('prof'),
+        name: cleanName,
+        created: new Date().toISOString()
+      };
+
+      config.profiles.push(newProfile);
+
+      const isFirstProfile = config.profiles.length === 1;
+      if (isFirstProfile) {
+        config.activeProfile = cleanName;
+      }
+
+      await this.saveConfig(config);
+
+      return { success: true, isFirstProfile };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * List all profiles
+   * @returns {Array} Array of profile objects with active status
+   */
+  async listProfiles() {
+    try {
+      const config = await this.loadConfig();
+      
+      return config.profiles.map(profile => ({
+        ...profile,
+        active: profile.name === config.activeProfile
+      }));
+    } catch (error) {
+      console.error(chalk.red('❌ Error loading profiles:'), error.message);
+      return [];
+    }
   }
 }
 
