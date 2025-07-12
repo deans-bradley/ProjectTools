@@ -65,6 +65,23 @@ profileCommand
     }
   });
 
+profileCommand
+  .command('switch <profileName>')
+  .description('Switch profiles')
+  .action(async (profileName) => {
+    try {
+      const result = await pt.switchProfile(profileName);
+
+      if (result.success) {
+        console.log(chalk.green(`✅ Switched to prfile "${result.profileName}"`));
+      } else {
+        console.log(chalk.red(`❌ ${result.message}`));
+      }
+    } catch (error) {
+      console.error(chalk.red('❌ Error switching profile:'), error.message);
+    }
+  });
+
 program
   .command('workspace')
   .description('Manage workspaces')
