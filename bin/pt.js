@@ -73,7 +73,28 @@ profileCommand
       const result = await pt.switchProfile(profileName);
 
       if (result.success) {
-        console.log(chalk.green(`✅ Switched to prfile "${result.profileName}"`));
+        console.log(chalk.green(`✅ Switched to profile "${result.profileName}"`));
+      } else {
+        console.log(chalk.red(`❌ ${result.message}`));
+      }
+    } catch (error) {
+      console.error(chalk.red('❌ Error switching profile:'), error.message);
+    }
+  });
+
+profileCommand
+  .command('remove <profileName>')
+  .description('Remove a specific profile')
+  .action(async (profileName) => {
+    try {
+      const result = await pt.removeProfile(profileName);
+      if (result.success) {
+        console.log(chalk.green(`✅ Profile "${result.removedProfile}" removed`));
+        if (result.activeProfileChanged && result.activeProfile) {
+          console.log(chalk.blue(`🎯 "${result.activeProfile}" is now your active profile`));
+        } else if (result.activeProfileChanged && !result.activeProfile) {
+          console.log(chalk.yellow('📝 No profiles found. Create one with: pt profile add <name>'));
+        }
       } else {
         console.log(chalk.red(`❌ ${result.message}`));
       }
