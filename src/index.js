@@ -11,7 +11,7 @@ class ProjectTools {
   constructor() {
     this.configPath = path.join(os.homedir(), '.projecttools', 'config.json');
     this.defaultConfig = {
-      appVersion: '0.1.11',
+      appVersion: '0.1.12',
       settings: {
         defaultProjectsPath: path.join(os.homedir(), 'Dev'),
         firstTimeSetup: false
